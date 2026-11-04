@@ -4,6 +4,7 @@ import { networkInterfaces } from 'node:os';
 import { execFile } from 'node:child_process';
 import { connect } from 'node:net';
 import { normalizeArticleUrl, parseArticleHtml, isWeChatImage } from './article-metadata.mjs';
+import { requestWeChat as request } from './wechat-request.mjs';
 
 const root = new URL('./', import.meta.url);
 let port = Number(process.env.PORT || 8765);
@@ -15,23 +16,9 @@ const allowedOrigins = new Set((process.env.ALLOWED_ORIGINS || '').split(',').ma
   return origin.origin;
 }));
 const cache = new Map();
-const userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36';
 const files = new Map([['/manifest.webmanifest', ['manifest.webmanifest', 'application/manifest+json; charset=utf-8']], ['/sw.js', ['sw.js', 'text/javascript; charset=utf-8']], ['/icons/icon-192.png', ['icons/icon-192.png', 'image/png']], ['/icons/icon-512.png', ['icons/icon-512.png', 'image/png']], ['/icons/apple-touch-icon.png', ['icons/apple-touch-icon.png', 'image/png']], ['/', ['index.html', 'text/html; charset=utf-8']], ['/index.html', ['index.html', 'text/html; charset=utf-8']], ['/README.md', ['README.md', 'text/plain; charset=utf-8']], ['/LICENSE', ['LICENSE', 'text/plain; charset=utf-8']]]);
 function cached(key) { const value = cache.get(key); if (value?.expires > Date.now()) return value.data; cache.delete(key); }
 function remember(key, data, ttl) { if (cache.size >= 24) cache.delete(cache.keys().next().value); cache.set(key, { data, expires: Date.now() + ttl }); return data; }
-async function request(url, isAllowed, limit) {
-  const signal = AbortSignal.timeout(18000);
-  for (let redirect = 0; redirect < 4; redirect++) {
-    if (!isAllowed(url)) throw new Error('上游返回了不受支持的地址');
-    const response = await fetch(url, { redirect: 'manual', signal, headers: { 'User-Agent': userAgent, 'Accept-Language': 'zh-CN,zh;q=0.9', Referer: 'https://mp.weixin.qq.com/' } });
-    if ([301, 302, 303, 307, 308].includes(response.status)) { const location = response.headers.get('location'); await response.body?.cancel(); if (!location) throw new Error('文章跳转地址无效'); url = new URL(location, url).href; continue; }
-    if (!response.ok) { await response.body?.cancel(); throw new Error(`微信读取失败（HTTP ${response.status}）`); }
-    const chunks = []; let length = 0;
-    for await (const chunk of response.body) { length += chunk.length; if (length > limit) throw new Error('文章或图片超出读取大小限制'); chunks.push(chunk); }
-    return { bytes: Buffer.concat(chunks), contentType: response.headers.get('content-type') || '' };
-  }
-  throw new Error('文章跳转次数过多');
-}
 const allowedArticle = input => { try { normalizeArticleUrl(input); return true; } catch { return false; } };
 function json(res, status, data) { res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' }); res.end(JSON.stringify(data)); }
 const server = http.createServer(async (req, res) => {
@@ -77,7 +64,7 @@ const server = http.createServer(async (req, res) => {
     res.writeHead(200, { 'Content-Type': file[1], 'Cache-Control': 'no-cache' }); res.end(await readFile(new URL(file[0], root)));
   } catch (error) {
     console.error('[读取失败]', error.message, error.cause?.code || '');
-    json(res, 502, { success: false, error: error.name === 'TimeoutError' ? '微信响应超时，请稍后重试' : error.message === 'fetch failed' ? '服务无法连接微信，请检查运行服务的电脑网络' : error.message });
+    json(res, 502, { success: false, error: error.message });
   }
 });
 function openBrowser() {

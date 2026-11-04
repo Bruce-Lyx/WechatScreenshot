@@ -8,7 +8,7 @@
   },
   "scripts": {
     "start": "node --use-env-proxy server.mjs",
-    "test": "node --test article-metadata.test.mjs server-startup.test.mjs build-pages.test.mjs",
+    "test": "node --test article-metadata.test.mjs wechat-request.test.mjs server-startup.test.mjs build-pages.test.mjs",
     "build:pages": "node scripts/build-pages.mjs"
   }
 }
