@@ -1,0 +1,14 @@
+{
+  "name": "wechat-moment-detail-maker",
+  "private": true,
+  "type": "module",
+  "license": "AGPL-3.0",
+  "engines": {
+    "node": ">=24.5 <25"
+  },
+  "scripts": {
+    "start": "node --use-env-proxy server.mjs",
+    "test": "node --test article-metadata.test.mjs server-startup.test.mjs build-pages.test.mjs",
+    "build:pages": "node scripts/build-pages.mjs"
+  }
+}

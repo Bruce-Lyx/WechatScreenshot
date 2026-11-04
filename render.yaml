@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: wechat-moment-tool
+    runtime: node
+    plan: free
+    buildCommand: npm install --omit=dev
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: ALLOWED_ORIGINS
+        value: https://bruce-lyx.github.io
