@@ -1,6 +1,6 @@
 # 用 github.io 作为手机入口
 
-本次发布目标：GitHub 仓库 `Bruce-Lyx/wechat-tool`，网页入口 `https://bruce-lyx.github.io/wechat-tool/`。根地址留给以后建立个人主页。本项目的 `render.yaml` 已预填允许来源 `https://bruce-lyx.github.io`。
+项目仓库名称为 `Bruce-Lyx/WechatScreenshot`，手机网页入口：[直接打开在线工具](https://bruce-lyx.github.io/WechatScreenshot/)。根地址留给个人主页。本项目的 `render.yaml` 已预填允许来源 `https://bruce-lyx.github.io`。
 
 配置完成后的使用方式是：手机打开 `https://你的GitHub用户名.github.io/仓库名/`，自动调用在线读取服务，获取公众号标题、封面和出处。手机不需要 CMD，电脑也不用一直开着。下面的账号配置只需做一次。
 
@@ -8,9 +8,9 @@
 
 创建一个公开仓库，例如 `moment-tool`。把本项目目录内的文件上传到仓库根目录，包括 `.github`、`scripts`、`icons` 文件夹和 `.node-version`。
 
-仓库首页应直接看到 `index.html`、`package.json`、`server.mjs`，不要在外面再套一层 `Wechat` 文件夹。不要上传 `node_modules`、`dist` 或自己的环境配置文件。保留 LICENSE、原作者与上游源码链接。
+仓库首页应直接看到 `index.html`、`package.json`、`server.mjs`，不要在外面再套一层 `Wechat-tool` 文件夹。不要上传 `node_modules`、`dist` 或自己的环境配置文件。保留 LICENSE、原作者与上游源码链接。
 
-如果不熟悉上传文件夹，可以使用 GitHub Desktop 把 `E:\Projects\Wechat` 发布为仓库；也可以通过 GitHub 网页的 Add file → Upload files 上传文件内容。
+如果不熟悉上传文件夹，可以使用 GitHub Desktop 把 `E:\Projects\Wechat-tool` 发布为仓库；也可以通过 GitHub 网页的 Add file → Upload files 上传文件内容。
 
 ## 2. 在 Render 启动读取接口
 
